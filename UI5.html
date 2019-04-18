@@ -21,7 +21,7 @@
         $.getJSON('http://localhost:59787/Test', function (data) { 	// /Test = Geschriebene Asp.mvc WebAPI welche DB daten im JSON Format bietet
             //data is the JSON string 
             test = data; 
-            dataReady(); 
+            dataReady(); 	//Aufrufen wenn Ajax call erfolgreich und Async result da...
         }); 
 
         function dataReady() { 
