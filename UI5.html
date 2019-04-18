@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html><head>
+<meta name="description" content="UI5 table example with local JSON model" />
+	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+	<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+	
+	<title>SAPUI5 Dynamic Table</title>
+	
+
+	<script id='sap-ui-bootstrap' type='text/javascript'
+		src='https://openui5.hana.ondemand.com/resources/sap-ui-core.js'
+		data-sap-ui-theme='sap_bluecrystal'
+		data-sap-ui-libs='sap.m,sap.ui.table'></script>
+	
+	<script>
+	
+	//Dynamische spalten 
+		var columnData = [{
+		    columnName: "firstName"
+		}, {
+		    columnName: "lastName"
+		}, {
+		    columnName: "department"
+		}];
+
+
+
+		var rowData = [{
+		    firstName: "Lucas",
+		    lastName: "Goebel",
+		    department: "Programming"
+		}, {
+		    firstName: "Lionel",
+		    lastName: "Messi",
+		    department: "Football"
+		}, {
+		    firstName: "Mohan",
+		    lastName: "Lal",
+		    department: "Film"
+		}];
+      
+        var oTable = new sap.ui.table.Table({
+		    visibleRowCount: 3
+		});
+
+
+		var oModel = new sap.ui.model.json.JSONModel();
+		oModel.setData({
+		    rows: rowData,
+		    columns: columnData
+		});
+		oTable.setModel(oModel);
+      
+		oTable.bindColumns("/columns", function(sId, oContext) {
+		    var columnName = oContext.getObject().columnName;
+		    return new sap.ui.table.Column({
+		        label: columnName,
+		        template: columnName,
+		    });
+		});
+      
+		oTable.bindRows("/rows");
+      page = new sap.m.Page({content:[
+        oTable
+      ]});
+      app = new sap.m.App();
+app.addPage(page);
+
+		app.placeAt("content");	
+	</script>
+	
+	</head>
+	<body class='sapUiBody'>
+		<div id='content'></div>
+	</body>
+</html>
