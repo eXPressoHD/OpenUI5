@@ -1,76 +1,117 @@
-<!DOCTYPE html>
-<html><head>
-<meta name="description" content="UI5 table example with local JSON model" />
-	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
-	<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
-	
-	<title>SAPUI5 Dynamic Table</title>
-	
+<!DOCTYPE html> 
+<html> 
 
-	<script id='sap-ui-bootstrap' type='text/javascript'
-		src='https://openui5.hana.ondemand.com/resources/sap-ui-core.js'
-		data-sap-ui-theme='sap_bluecrystal'
-		data-sap-ui-libs='sap.m,sap.ui.table'></script>
-	
-	<script>
-	
-	//Dynamische spalten 
-		var columnData = [{
-		    columnName: "firstName"
-		}, {
-		    columnName: "lastName"
-		}, {
-		    columnName: "department"
-		}];
+<head> 
+<meta name="description" content="UI5 table example with local JSON model" /> 
+<meta http-equiv='X-UA-Compatible' content='IE=edge' /> 
+<meta http-equiv='Content-Type' content='text/html;charset=UTF-8' /> 
+
+<title>SAPUI5 Dynamic Table</title> 
 
 
+<script id='sap-ui-bootstrap' type='text/javascript' 
+        src='https://openui5.hana.ondemand.com/resources/sap-ui-core.js' data-sap-ui-theme='sap_bluecrystal' 
+        data-sap-ui-libs='sap.m,sap.ui.table'></script> 
 
-		var rowData = [{
-		    firstName: "Lucas",
-		    lastName: "Goebel",
-		    department: "Programming"
-		}, {
-		    firstName: "Lionel",
-		    lastName: "Messi",
-		    department: "Football"
-		}, {
-		    firstName: "Mohan",
-		    lastName: "Lal",
-		    department: "Film"
-		}];
-      
-        var oTable = new sap.ui.table.Table({
-		    visibleRowCount: 3
-		});
+<script> 
 
+        var test = []; 
 
-		var oModel = new sap.ui.model.json.JSONModel();
-		oModel.setData({
-		    rows: rowData,
-		    columns: columnData
-		});
-		oTable.setModel(oModel);
-      
-		oTable.bindColumns("/columns", function(sId, oContext) {
-		    var columnName = oContext.getObject().columnName;
-		    return new sap.ui.table.Column({
-		        label: columnName,
-		        template: columnName,
-		    });
-		});
-      
-		oTable.bindRows("/rows");
-      page = new sap.m.Page({content:[
-        oTable
-      ]});
-      app = new sap.m.App();
-app.addPage(page);
+	//OData service benutzen
+        $.getJSON('http://localhost:59787/Test', function (data) { 	// /Test = Geschriebene Asp.mvc WebAPI welche DB daten im JSON Format bietet
+            //data is the JSON string 
+            test = data; 
+            dataReady(); 
+        }); 
 
-		app.placeAt("content");	
-	</script>
-	
-	</head>
-	<body class='sapUiBody'>
-		<div id='content'></div>
-	</body>
-</html>
+        function dataReady() { 
+            var arr = []; 
+            if (test.value.length > 0) { 
+                console.log(test.value); 
+                var columnsIn = test.value[0]; 
+                for (var key in columnsIn) { 
+                    console.log(key); 
+                    arr.push(key); 
+                } 
+                setTable(arr); 
+            } else { 
+                console.log("no columns..."); 
+            } 
+        } 
+
+	//Reihen JSON Testdaten...
+        var rowDataTest = [{ 
+            Type: "Sachin", 
+            Description: "Tendulkar" 
+        }, { 
+            firstName: "Lionel", 
+            lastName: "Messi", 
+            department: "Football" 
+        }, { 
+            ID: "Mohan", 
+            lastName: "Lal", 
+            department: "Film", 
+            SKIDNR : [ 
+                {langId : "bg", langDesc : "Bulgarian"}, 
+            ] 
+        }]; 
+
+        var oTable = new sap.ui.table.Table({ 
+            //visibleRowCount: 3 
+        }); 
+
+        var oModel = new sap.ui.model.json.JSONModel(); 
+
+        function setTable(arr) { 
+            oModel.setData({ 
+                rows: test.value,    //use test.value for odata    OR rowDataTest 
+                columns: arr 
+            }); 
+
+            oTable.setModel(oModel); 
+
+            var counter = 0; 
+            oTable.bindColumns("/columns", function (sId, oContext) { 
+
+                var columnName = arr[counter]; 
+
+                var nameColumnTemplate = new sap.m.Input({ 
+                      content : [new sap.m.Button({text : "Click"})] 
+                }); 
+
+                var defaultTemplate = new sap.m.Input({ 
+                        value: "{" + columnName + "}", 
+                        change: function () { 
+                            alert(JSON.stringify(this.getModel().getData())); 
+                        } 
+                    }) 
+
+                counter++; 
+                return new sap.ui.table.Column({ 
+                    label: columnName, 
+                    template: nameColumnTemplate 
+                }); 
+            }); 
+
+            oTable.bindRows("/rows"); 
+        } 
+
+        page = new sap.m.Page({ 
+            title: "TestApp", 
+            content: [ 
+                oTable 
+            ] 
+        }); 
+        app = new sap.m.App(); 
+        app.addPage(page); 
+
+        app.placeAt("content"); 
+</script> 
+
+</head> 
+
+<body class='sapUiBody'> 
+<div id='content'></div> 
+</body> 
+
+</html> 
